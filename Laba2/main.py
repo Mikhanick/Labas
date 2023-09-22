@@ -25,7 +25,7 @@ def main(a, b, c):  # основной блок программы
             if b == 0:
                 out = 'Корней нет'
             else:
-                out = f'X = {convert(-c / b)}'
+                out = f'X = {convert_to_string(-c / b)}'
     else:
         D = b ** 2 - 4 * a * c  # рассчет Дискриминанта (D)
         if D > 0:
@@ -33,16 +33,16 @@ def main(a, b, c):  # основной блок программы
             x1 = (-b + D ** 0.5) / (2 * a)
             x2 = (-b - D ** 0.5) / (2 * a)
 
-            out = f'X1 = {convert(x1)}\nX2 = {convert(x2)}'
+            out = f'X1 = {convert_to_string(x1)}\nX2 = {convert_to_string(x2)}'
         else:
             if D == 0:
-                out = f'X = {convert(-b / (2 * a))}'
+                out = f'X = {convert_to_string(-b / (2 * a))}'
             else:
                 out = 'Корней нет'
     return out
 
 
-def convert(value):
+def convert_to_string(value):
     return f'{value:.7g}'  # привод числа к требуемому виду
 
 
