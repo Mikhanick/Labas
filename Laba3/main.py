@@ -1,7 +1,9 @@
 # Саватеев Михаил ИУ7-16Б
 # Лабораторная работа номер 3 "Треугольник"
+from typing import Tuple, List
 
-def input_koord():  # Функция ввода коорднат
+
+def input_koord()-> tuple[list[int], list[int], list[int]]:  # Функция ввода коорднат
     while True:
         x1 = int(input('Введите координату Х1: '))
         y1 = int(input('Введите координату Y1: '))
@@ -16,11 +18,11 @@ def input_koord():  # Функция ввода коорднат
             return [x1, y1], [x2, y2], [x3, y3]
 
 
-def length(x1, y1, x2, y2):  # функция для вычисления длины стороны треугольника
+def length(x1:float, y1:float, x2:float, y2:float)->float:  # функция для вычисления длины стороны треугольника
     return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
 
 
-def area(a1, a2, a3):  # функция для вычисления стороны стороны треугольника
+def area(a1:float, a2:float, a3:float) -> float:  # функция для вычисления стороны стороны треугольника
     p = (a1 + a2 + a3) / 2
     return (p * (p - a1) * (p - a2) * (p - a3)) ** 0.5
 
@@ -47,8 +49,8 @@ def main():
         print('\033[32mТреугольник не остроугольный\033[0m')
 
     print() #вводд координат точки
-    dotCoordinatesX = float(input('Введите координатy X точки: '))
-    dotCoordinatesY = float(input('Введите координатy Y точки: '))
+    dotCoordinateX = float(input('Введите координатy X точки: '))
+    dotCoordinateY = float(input('Введите координатy Y точки: '))
     print()
 
     dotAreas = [0] * 3  # массив площадей, на которые точка делит изначальный треугольник
@@ -56,8 +58,8 @@ def main():
 
     for i in range(3):  # обработка всех трех треугольника, на которые точка делит основной
         a1 = length(*coordinates[(i + 1) % 3], *coordinates[i])
-        a2 = length(dotCoordinatesX, dotCoordinatesY, *coordinates[i])
-        a3 = length(dotCoordinatesX, dotCoordinatesY, *coordinates[(i + 1) % 3])
+        a2 = length(dotCoordinateX, dotCoordinateY, *coordinates[i])
+        a3 = length(dotCoordinateX, dotCoordinateY, *coordinates[(i + 1) % 3])
 
         dotAreas[i] = area(a1, a2, a3)
         dotRange[i] = dotAreas[i] / a1 * 2

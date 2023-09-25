@@ -3,9 +3,10 @@
 # вариант 8 усеченный конус
 
 from math import pi, sqrt  # импорт числа пи и функции квадратного корня из библиотеки math
+from typing import Tuple
 
 
-def inp():  # блок ввода данных
+def inp() -> tuple[float, float, float]:  # блок ввода данных
     try:  # обработка некорректного воода данных
         r = float(input('input r: '))  # input r
         R = float(input('input R: '))  # input R
@@ -20,16 +21,16 @@ def inp():  # блок ввода данных
     return r, R, h  # возврат значений в виде кортежа
 
 
-def main(r, R, h):  # начало функции счета
+def main(r: int, R: int, h: int) -> dict:  # начало функции счета
     L = sqrt(((R - r) ** 2 + h ** 2))  # рассчет длины апофемы
-    Side_surface_area = pi * (R + r) * L  # рассчет площади бока
-    Total_surface_area = Side_surface_area + pi * r ** 2 + pi * R ** 2  # рассчет полной площади
+    sideSurfaceArea = pi * (R + r) * L  # рассчет площади бока
+    totalSurfaceArea = sideSurfaceArea + pi * r ** 2 + pi * R ** 2  # рассчет полной площади
     V = (1 / 3) * pi * h * (r ** 2 + R ** 2 + R * r)  # рассчет объема
-    return {'V': V, 'Sполн': Total_surface_area,
-            'Sбок': Side_surface_area}  # возврат значений в виде кортежа
+    return {'V': V, 'Sполн': totalSurfaceArea,
+            'Sбок': sideSurfaceArea}  # возврат значений в виде кортежа
 
 
-def out(value):
+def out(value: intl):
     print(f'\033[92m\033[3m\033[4m{value[0]}: {value[1]:.7g}\033[0m')  # привод к требуемому виду и вывод
 
 
