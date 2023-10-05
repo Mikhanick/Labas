@@ -1,11 +1,11 @@
 import math
 
-LENGTH = 11
+LENGTH = 60
 MAX_AMPLITUDE = 30
 X_SCALE = 0.4
 Y_SCALE = 1.8
-FUNCTION = '(16 - x**2)**0.5'
-FUNCTION2 = '-(16 - x**2)**0.5'
+FUNCTION = '(x)**0.5'
+FUNCTION2 = '-(x)**0.5'
 
 
 def make_matrix(x: int, y: int, empty_value='   ') -> list[list]:
