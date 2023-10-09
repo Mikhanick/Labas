@@ -15,8 +15,8 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
     iterations = math.ceil(
         (stop_value - start_value) / step) + 1  # вычисляем количество элементов в заданной последовательности
     first_table = '''+-----------------------------------+
-    |    q      |    x1     |    x2     |
-    +-----------------------------------+'''  # формируем начало первой таблицы
+|    q      |    x1     |    x2     |
++-----------------------------------+'''  # формируем начало первой таблицы
     for iter in range(iterations):  # перебираем элементы последовательности
         q = start_value + step * iter  # элемент последовательности
         x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2  # значение х1 для элемента последовательности
@@ -60,11 +60,15 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
         # отрисовываем
         for iter in range(0, iterations):
             q = start_value + step * iter
+            if iter%2==0:
+                empty_symbol = ' '
+            else:
+                empty_symbol = '-'
             x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
             x1 = x1 - min1  # находим значение функции аналогично первой таблице
             dot = round(x1 / y_scale)  # находим порядковый номер точки в таблице
             qstr = f'{q:^11.5g}'
-            second_table += '\n' + qstr + '|' + ' ' * (dot - 1) + '*' + ' ' * (WIDTH - dot)  # добавляем строчку в переменую
+            second_table += '\n' + qstr + '|' + empty_symbol * (dot - 1) + '*' + empty_symbol * (WIDTH - dot)  # добавляем строчку в переменую
         print(second_table)
     else:
         dot0 = max(1, round(-min1 / y_scale))  # находим порядкой номер точки, в которой проходит прямая у=0
@@ -74,17 +78,21 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
             x1 = x1 - min1
             dot = max(1, round(x1 / y_scale))
             qstr = f'{q:^11.5g}'  # аналогичные действия
+            if iter%2==0:
+                empty_symbol = ' '
+            else:
+                empty_symbol = '-'
             if dot0 == dot:
-                second_table += '\n' + qstr + '|' + ' ' * (dot - 1) + '*' + ' ' * (
+                second_table += '\n' + qstr + '|' + empty_symbol * (dot - 1) + '*' + empty_symbol * (
                             WIDTH - dot)  # если точка совпадает с прямой у=0 то выводим только точку
             elif dot0 < dot:
-                second_table += '\n' + qstr + '|' + ' ' * (dot0 - 1) + '|' + ' ' * (dot - 1 - dot0) + '*' + ' ' * (
+                second_table += '\n' + qstr + '|' + empty_symbol * (dot0 - 1) + '|' + empty_symbol * (dot - 1 - dot0) + '*' + empty_symbol * (
                             WIDTH - dot)  # если прямая левее точки
             else:
                 second_table += ('\n' + qstr + '|' +
-                                 ' ' * (dot - 1) + '*'+
-                                 ' ' * (dot0 - 1 - dot)+
-                                 '|' + ' ' * (WIDTH - dot))  # если точка левее прямой
+                                 empty_symbol * (dot - 1) + '*'+
+                                 empty_symbol * (dot0 - 1 - dot)+
+                                 '|' + empty_symbol * (WIDTH - dot0 ))  # если точка правее прямой
         print(second_table)  # отрисовываем график
         print('Дополнительное задание:\nXmax1 - Xmax2 =',max1-max2)
 else:
