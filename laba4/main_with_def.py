@@ -2,7 +2,21 @@
 # Лабораторная работа номер 4 “График”
 import math
 
-WIDTH = 90  # Задаем ширину графического поля
+def stoka(star,zero, add, width = 90):
+    s=''
+    for i in range(1,width+1):
+        if i == star:
+            s+= '*'
+        elif i == zero:
+            s+='|'
+
+
+        elif i in add:
+            s += '.'
+        else:
+            s+= " "
+    return s
+WIDTH = 120  # Задаем ширину графического поля
 
 # start_value = 0
 # step = 0.05
@@ -54,47 +68,29 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
         serif = serif_fraction * i + min1
         second_table += f'{serif:^{round((WIDTH - 2 * 11) / (serifs - 2))}.5g}'  # добавляем все засечки в шапку
     second_table += f'{max1:>11.5g}'
-
+    dots = []
     y_scale = (max1 - min1) / WIDTH  # находим цену деления одной точки на графике
-    if min1 > 0 or max1 < 0:  # частный случай, когда весь график с одной стороны от прямой у=0, тогда прямую не
-        # отрисовываем
-        for iter in range(0, iterations):
-            q = start_value + step * iter
-            if iter%2==0:
-                empty_symbol = ' '
-            else:
-                empty_symbol = '-'
-            x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
-            x1 = x1 - min1  # находим значение функции аналогично первой таблице
-            dot = round(x1 / y_scale)  # находим порядковый номер точки в таблице
-            qstr = f'{q:^11.5g}'
-            second_table += '\n' + qstr + '|' + empty_symbol * (dot - 1) + '*' + empty_symbol * (WIDTH - dot)  # добавляем строчку в переменную
-        print(second_table)
-    else:
-        dot0 = max(1, round(-min1 / y_scale))  # находим порядковый номер точки, в которой проходит прямая у=0
-        for iter in range(0, iterations):
-            q = start_value + step * iter
-            x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
-            x1 = x1 - min1
-            dot = max(1, round(x1 / y_scale))
-            qstr = f'{q:^11.5g}'  # аналогичные действия
-            if iter%2==0:
-                empty_symbol = ' '
-            else:
-                empty_symbol = '-'
-            if dot0 == dot:
-                second_table += '\n' + qstr + '|' + empty_symbol * (dot - 1) + '*' + empty_symbol * (
-                            WIDTH - dot)  # если точка совпадает с прямой у=0, то выводим только точку
-            elif dot0 < dot:
-                second_table += '\n' + qstr + '|' + empty_symbol * (dot0 - 1) + '|' + empty_symbol * (dot - 1 - dot0) + '*' + empty_symbol * (
-                            WIDTH - dot)  # если прямая левее точки
-            else:
-                second_table += ('\n' + qstr + '|' +
-                                 empty_symbol * (dot - 1) + '*'+
-                                 empty_symbol * (dot0 - 1 - dot)+
-                                 '|' + empty_symbol * (WIDTH - dot0 ))  # если точка правее прямой
+    # for iter in range(0, iterations):
+    #     q = start_value + step * iter
+    #
+    #     x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
+    #     x1 = x1 - min1  # находим значение функции аналогично первой таблице
+    #     dot = round(x1 / y_scale)  # находим порядковый номер точки в таблице
+    #     dots.append(dot)
 
-        print(second_table)  # отрисовываем график
-        print('Дополнительное задание:\nXmax1 - Xmax2 =',max1-max2)
+    dot0 = max(1, round(-min1 / y_scale))  # находим порядковый номер точки, в которой проходит прямая у=0
+    for iter in range(0, iterations):
+        q = start_value + step * iter
+        x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
+        x1 = x1 - min1
+        dot = max(1, round(x1 / y_scale))
+        qstr = f'{q:^11.5g}'  # аналогичные действия
+
+        s = '\n' + qstr + '|'
+        s += stoka(dot,dot0,dots,width=WIDTH)#вместо дотс можно положить местоположение засечек
+        second_table += s
+        dots.append(dot)
+    print(second_table)  # отрисовываем график
+    print('Дополнительное задание:\nXmax1 - Xmax2 =',max1-max2)
 else:
     print('Ошибка! Левый конец отрезка должен быть меньше правого, между значениями должно быть больше одного шага, шаг должен быть положительным!')
