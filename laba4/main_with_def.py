@@ -4,7 +4,7 @@ import math
 
 def stoka(star,zero, add, width = 90):
     s=''
-    for i in range(1,width):
+    for i in range(1,width+1):
         if i == star:
             s+= '*'
         elif i == zero:
@@ -16,15 +16,15 @@ def stoka(star,zero, add, width = 90):
         else:
             s+= " "
     return s
-WIDTH = 90  # Задаем ширину графического поля
+WIDTH = 120  # Задаем ширину графического поля
 
 # start_value = 0
 # step = 0.05
 # stop_value = 1.2
 #
-start_value = float(input('Введите первый элемент последовательности: '))  # Ввод начального элемента поледовательности
+start_value = float(input('Введите первый элемент последовательности: '))  # Ввод начального элемента последовательности
 step = float(input('Введите разность последовательности: '))  # ввод шага последовательности
-stop_value = float(input('Введите конечный элемент послеовательности: '))  # ввод конца последовательности
+stop_value = float(input('Введите конечный элемент последовательности: '))  # ввод конца последовательности
 if start_value < stop_value and (stop_value-start_value)>step and step>0:
     iterations = math.ceil(
         (stop_value - start_value) / step) + 1  # вычисляем количество элементов в заданной последовательности
@@ -39,7 +39,7 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
         else:
             x2 = 2 - q * math.e ** q  # значение х2 для элемента последовательности
 
-        if iter == 0:  # если это первый элемент последовательности, то он становистя и наибольшим и наименьшим
+        if iter == 0:  # если это первый элемент последовательности, то он становится и наибольшим и наименьшим
             max1, min1 = x1, x1
             max2, min2 = x2, x2
         if x1 > max1:  # поиск наибольших и наименьших значений
@@ -60,7 +60,7 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
     first_table += '\n+-----------------------------------+'
     print(first_table)  # вывод таблицы со значениями
 
-    serifs = int(input('Введите количество засечек: '))  # ввод количества зачсечек в шапке графика
+    serifs = int(input('Введите количество засечек: '))  # ввод количества засечек в шапке графика
 
     second_table = ' ' * 12 + f'{min1:<11.5g}'  # инициализируем вторую таблицу, вводя минимальное значение
     serif_fraction = (max1 - min1) / (serifs - 1)  # находим, какая часть графика находится между каждыми двумя засечками
@@ -70,15 +70,15 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
     second_table += f'{max1:>11.5g}'
     dots = []
     y_scale = (max1 - min1) / WIDTH  # находим цену деления одной точки на графике
-    for iter in range(0, iterations):
-        q = start_value + step * iter
+    # for iter in range(0, iterations):
+    #     q = start_value + step * iter
+    #
+    #     x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
+    #     x1 = x1 - min1  # находим значение функции аналогично первой таблице
+    #     dot = round(x1 / y_scale)  # находим порядковый номер точки в таблице
+    #     dots.append(dot)
 
-        x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
-        x1 = x1 - min1  # находим значение функции аналогично первой таблице
-        dot = round(x1 / y_scale)  # находим порядковый номер точки в таблице
-        dots.append(dot)
-
-    dot0 = max(1, round(-min1 / y_scale))  # находим порядкой номер точки, в которой проходит прямая у=0
+    dot0 = max(1, round(-min1 / y_scale))  # находим порядковый номер точки, в которой проходит прямая у=0
     for iter in range(0, iterations):
         q = start_value + step * iter
         x1 = 2.97 * q ** 4 + 4.84 * q ** 3 - 16.4 * q ** 2 + 41.2 * q - 33.2
@@ -87,9 +87,9 @@ if start_value < stop_value and (stop_value-start_value)>step and step>0:
         qstr = f'{q:^11.5g}'  # аналогичные действия
 
         s = '\n' + qstr + '|'
-        s += stoka(dot,dot0,dots)#вместо дотс можно положить местоположение засечек
+        s += stoka(dot,dot0,dots,width=WIDTH)#вместо дотс можно положить местоположение засечек
         second_table += s
-
+        dots.append(dot)
     print(second_table)  # отрисовываем график
     print('Дополнительное задание:\nXmax1 - Xmax2 =',max1-max2)
 else:
