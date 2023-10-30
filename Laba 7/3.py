@@ -5,8 +5,8 @@ max_word = ''
 max_cnt = 0
 for i in array:
     cnt = 0
-    for letter in "AEIOUY":
-        cnt += i.upper().count(letter)
+    for letter in "AEIOUYaeioyu": # будем заменять все гласные буквы англицкого алфавита
+        cnt += i.count(letter)
     if cnt>max_cnt:
         max_word = i
         max_cnt = cnt
