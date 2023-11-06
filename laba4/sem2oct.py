@@ -51,7 +51,7 @@ def print_matrix(matrix: list[list]):
         for j in range(len(matrix)):
             print(matrix[j][-i - 1], end='')
         print('\n', end='')
-    # print(matrix)
+    # print(matrixD)
 
 
 if __name__ == '__main__':
