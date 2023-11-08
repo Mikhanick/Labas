@@ -28,7 +28,7 @@ else:
     for i in range (len(matrix)): # перебираем строки
         for j in range (len(matrix[0])): #перебираем столбцы
             if i>(len(matrix[0])-j-1): # если ниже побочной диагонали ищем минимальное
-                #print(matrixD[i][j])
+                #print(matrixA[i][j])
                 mn = min(mn,matrix[i][j])
             if i<j: # если выше главной ищем макс
                 mx = max(mx,matrix[i][j])
