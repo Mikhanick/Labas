@@ -1,3 +1,5 @@
+# Саватеев Михаил группа ИУ7-16Б
+# Лабораторная работа номер 9, задание 7
 matrix_3d = []
 out_flag = 0
 length_of_matrix = -1
@@ -14,6 +16,7 @@ while True:
             '. Когда размер слоя матрицы '
             'будет равен размеру других слоев, ввод слоя завершится.\nДля окончания ввода трехмерной матрицы введите '
             'пустой слой трехмерной матрицы.')
+
     while True:
         line = [i for i in input().split()]  # ввод строки в матрицу
         if matrix == [] and len(line) != 0 and length_of_matrix == -1:
@@ -27,8 +30,7 @@ while True:
             # то сохраняем первый слой матрицы в трехмерную матрицу
             print("Ввод первого слоя матрицы завершен")
             break
-
-        elif len(matrix[0]) == len(line) and length_of_matrix == -1 or length_of_matrix != -1 and len(
+        elif length_of_matrix == -1 and len(matrix[0]) == len(line) or length_of_matrix != -1 and len(
                 matrix_3d[0][0]) == len(
                 line):  # если длина строки равна длине первой строке в первом слое либо равна длине строк в первом
             # слою, то сохраняем строку в слой, иначе выводим ошибку и просим
@@ -58,7 +60,8 @@ while True:
         break
     else:
         print("\033[31m\nОшибка. Вы ввели несуществующий срез, повторите ввод!\n\033[0m")
-for line in matrix_3d[i - 1]:  # вывод
-    for el in line:
-        print(f' {el} ', end='')
+
+for line in range(len(matrix_3d)):
+    for el in range(len(matrix_3d[0][0])):
+        print(f'{matrix_3d[line][i-1][el]}',end=' ')
     print()

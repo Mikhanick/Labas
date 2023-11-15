@@ -42,7 +42,8 @@ for i in range(len(matrixA)):  # создаем матрицу С
     matrixC.append([])
     for j in range(len(matrixA[0])):
         matrixC[-1].append(matrixA[i][j] * matrixB[i][j])
-
+# Саватеев Михаил группа ИУ7-16Б
+# Лабораторная работа номер 9, задание 6
 arrayV = [0] * (len(matrixA[0]))  # создаем массив V
 for i in range(len(matrixA)):  # считаем и записываем сумму столбцов в массив V
     for j in range(len(matrixA[0])):
