@@ -1,10 +1,11 @@
 # Саватеев Михаил группа ИУ7-16Б
 # Лабораторная работа номер 10
 #  Варианты: Правых прямоугольников / Трапеций
+
 from user_inputs import *
 
 
-def check_is_float(prompt):  # проверка на ввод числа
+def check_is_float(prompt: str) -> float:  # проверка на ввод числа
     while True:
         x = input(prompt)
         flag_digit = 0
@@ -20,7 +21,11 @@ def check_is_float(prompt):  # проверка на ввод числа
         col_e = 0
         col_dot = 0
 
+        flag_to_pass = 0
         for i in range(flag_digit, len(x)):  # перебираем символы
+            if flag_to_pass:
+                flag_digit = 0
+                continue
             if x[i].isdigit():
                 continue
             elif x[i] == '.' and col_dot == 0 and col_e == 0:  # если точка и ее еще не было, то сдвигаемся на следующий
@@ -37,6 +42,7 @@ def check_is_float(prompt):  # проверка на ввод числа
                         len(x) - 2):  # если следующий символ минус или плюс и он не
                     # последний, то сдвигаемся на следующий
                     if x[i + 2].isdigit():
+                        flag_to_pass = 1
                         continue
                     else:
                         print('\033[31m\033[1mОшибка. Введите число!\033[0m')
@@ -54,7 +60,7 @@ def check_is_float(prompt):  # проверка на ввод числа
     return float(x)
 
 
-def check_is_int(prompt):  # проверка на ввод целого числа
+def check_is_int(prompt: str) -> int:  # проверка на ввод целого числа
     while True:
         x = input(prompt)
         flag_digit = 0
@@ -67,7 +73,7 @@ def check_is_int(prompt):  # проверка на ввод целого чис�
     return int(x)
 
 
-def input_with_check():  # ввод данных с проверкой
+def input_with_check() -> tuple[float, float, int, int]:  # ввод данных с проверкой
     while True:
         start = check_is_float('Введите начало отрезка: ')  # проверка на ввод числа
         end = check_is_float('Введите конец отрезка: ')  # проверка на ввод числа
@@ -85,7 +91,7 @@ def input_with_check():  # ввод данных с проверкой
     return start, end, n1, n2
 
 
-def integral_trapezoid(start, end, n):  # метод трапеций
+def integral_trapezoid(start: float, end: float, n: int) -> float:  # метод трапеций
     h = (end - start) / n
     sm = 0
     for i in range(n):
@@ -93,7 +99,7 @@ def integral_trapezoid(start, end, n):  # метод трапеций
     return sm
 
 
-def integral_right_rectangles(start, end, n):  # метод правых прямоугольников
+def integral_right_rectangles(start: float, end: float, n: int) -> float:  # метод правых прямоугольников
     h = (end - start) / n
     sm = 0
     for i in range(n):
@@ -101,7 +107,7 @@ def integral_right_rectangles(start, end, n):  # метод правых пря�
     return sm
 
 
-def print_table(l1, l2, l3, l4):  # вывод таблицы
+def print_table(l1: float, l2: float, l3: float, l4: float):  # вывод таблицы
     print('+---------------+---------------------+---------------------+')
     print('|               |         N1          |         N2          |')
     print('|---------------|---------------------|---------------------|')
@@ -110,7 +116,7 @@ def print_table(l1, l2, l3, l4):  # вывод таблицы
     print('+---------------+---------------------+---------------------+')
 
 
-def main(e):  # основная функция
+def main(e: float):  # основная функция
     start, end, n1, n2 = input_with_check()
 
     l1 = integral_right_rectangles(start, end, n1)
@@ -138,11 +144,14 @@ def main(e):  # основная функция
     if abs(l3 - integral_ans) < abs(accuracy):
         most_accuracy = 2
         accuracy = l3 - integral_ans
+    if integral_ans != 0:
 
-    relation_accuracy = abs(accuracy) / integral_ans * 100
-    print(f'Наименьшая погрешность: {abs(accuracy):.7g}\n'
-          f'Относительная погрешность: {relation_accuracy:.7g}%\n')  # выводим погрешность
-
+        relation_accuracy = accuracy / abs(integral_ans) * 100
+        print(f'Наименьшая погрешность: {abs(accuracy):.7g}\n'
+              f'Относительная погрешность: {relation_accuracy:.7g}%\n')  # выводим погрешность
+    else:
+        print(f'Наименьшая погрешность: {abs(accuracy):.7g}\n'
+              'Невозможно вычислить погрешность, из-за деления на ноль')
     n = 1
 
     if most_accuracy == 2:  # выбираем метод для уточнения
