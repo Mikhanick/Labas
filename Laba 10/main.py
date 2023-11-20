@@ -12,6 +12,8 @@ def check_is_float(prompt: str) -> float:  # проверка на ввод чи
 
         if x[flag_digit] == '-':  # если введен минус, то сдвигаемся на следующий символ
             flag_digit += 1
+        if x[flag_digit] == '.':
+            flag_digit += 1
         if x[flag_digit].isdigit():
             flag_digit += 1
         else:  # если первый символ не цифра, то выводим ошибку и просим повторить ввод
@@ -30,6 +32,8 @@ def check_is_float(prompt: str) -> float:  # проверка на ввод чи
                 continue
             elif x[i] == '.' and col_dot == 0 and col_e == 0:  # если точка и ее еще не было, то сдвигаемся на следующий
                 col_dot += 1
+                if i == len(x)-1:
+                    continue
                 if x[i + 1].isdigit():
                     continue
                 else:
@@ -38,7 +42,7 @@ def check_is_float(prompt: str) -> float:  # проверка на ввод чи
             elif x[i] == 'e' and col_e == 0 and i != (
                     len(x) - 1):  # если e и ее еще не было, то сдвигаемся на следующий
                 col_e = 1
-                if x[i + 1] == '-' or x[i + 1] == '+' and i != (
+                if (x[i + 1] == '-' or x[i + 1] == '+') and i != (
                         len(x) - 2):  # если следующий символ минус или плюс и он не
                     # последний, то сдвигаемся на следующий
                     if x[i + 2].isdigit():
