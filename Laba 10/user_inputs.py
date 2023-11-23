@@ -1,4 +1,4 @@
-NEEDED_ACCURACY = 0.0001 # необходимая точность
+NEEDED_ACCURACY = 0.001 # необходимая точность
 
 def function (x): # функция
     return x**2 + 2*x + 1

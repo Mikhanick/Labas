@@ -26,7 +26,7 @@ def check_is_float(prompt: str) -> float:  # проверка на ввод чи
         flag_to_pass = 0
         for i in range(flag_digit, len(x)):  # перебираем символы
             if flag_to_pass:
-                flag_digit = 0
+                flag_to_pass = 0
                 continue
             if x[i].isdigit():
                 continue
@@ -78,13 +78,13 @@ def check_is_int(prompt: str) -> int:  # проверка на ввод цело
 
 
 def input_with_check() -> tuple[float, float, int, int]:  # ввод данных с проверкой
-    while True:
-        start = check_is_float('Введите начало отрезка: ')  # проверка на ввод числа
-        end = check_is_float('Введите конец отрезка: ')  # проверка на ввод числа
-        if start < end:
-            break
-        else:
-            print('\033[31m\033[1mОшибка. Начало отрезка должно быть меньше конца!\033[0m')
+    global negative
+    negative = 1
+    start = check_is_float('Введите начало отрезка: ')  # проверка на ввод числа
+    end = check_is_float('Введите конец отрезка: ')  # проверка на ввод числа
+    if start > end:
+        start, end = end, start
+        negative = -1
     while True:
         n1 = check_is_int('Введите количество разбиений для первого способа: ')
         n2 = check_is_int('Введите количество разбиений для второго способа: ')
@@ -98,20 +98,23 @@ def input_with_check() -> tuple[float, float, int, int]:  # ввод данны�
 def integral_trapezoid(start: float, end: float, n: int) -> float:  # метод трапеций
     h = (end - start) / n
     sm = 0
+    global negative
     for i in range(n):
         sm += (function(start + h * i) + function(start + h * (i + 1))) / 2 * h
-    return sm
+    return sm*negative
 
 
 def integral_right_rectangles(start: float, end: float, n: int) -> float:  # метод правых прямоугольников
     h = (end - start) / n
+    global negative
     sm = 0
-    for i in range(n):
+    for i in range(1,n+1):
         sm += function(start + h * i) * h
-    return sm
+    return sm*negative
 
 
 def print_table(l1: float, l2: float, l3: float, l4: float):  # вывод таблицы
+    print()
     print('+---------------+---------------------+---------------------+')
     print('|               |         N1          |         N2          |')
     print('|---------------|---------------------|---------------------|')
@@ -119,21 +122,32 @@ def print_table(l1: float, l2: float, l3: float, l4: float):  # вывод та�
     print(f'|   Трапеций    |     {l3:^11.5g}     |     {l4:^11.5g}     |')
     print('+---------------+---------------------+---------------------+')
 
-
+def porabol_integral(start,stop,n):
+    global negative
+    sm = 0
+    h = (stop-start)/n
+    if n%2==0:
+        for i in range(0,n-2):
+            sm+=(h/6)*(function(start + h * i) + 4 * function(start + (1 + i) * h) + function(start + ( i + 2 ) * h ))
+    else:
+        print('количество разбиений должно быть кратно 2м')
+        return 0
+    return sm*negative
 def main(e: float):  # основная функция
     start, end, n1, n2 = input_with_check()
-
+    global negative
     l1 = integral_right_rectangles(start, end, n1)
     l2 = integral_right_rectangles(start, end, n2)
     l3 = integral_trapezoid(start, end, n1)
     l4 = integral_trapezoid(start, end, n2)
 
-    integral_ans = integral(end) - integral(start)
+    integral_ans = (integral(end) - integral(start))*negative
     print_table(l1, l2, l3, l4)
     print()
-    print(f'Точное значение интеграла: {integral_ans}\n')  # выводим точное значение интеграла
+    print(f'Точное значение интеграла: {integral_ans:.7g}\n')  # выводим точное значение интеграла
     # (для отладки, не по задаче)
-
+    print(f'Значение интеграла по методу параболы с n1: {porabol_integral(start, end, n1):.7g}')
+    print(f'Значение интеграла по методу параболы с n2: {porabol_integral(start, end, n2):.7g}')
     most_accuracy = 2  # выбираем наиболее точный метод
     accuracy = l4 - integral_ans
 
