@@ -53,37 +53,37 @@ def check_is_float(x: str) -> bool:  # проверка на ввод числа
         return True
 
 
-def input_array():
-    print("Введите через пробел элементы массива, который необходимо отсортировать")
+def input_array() -> list:
+    print("Введите через пробел элементы массива, который необходимо отсортировать")  # ввод массива
     array = input().split()
     array_out = []
-    for el in array:
+    for el in array:  # проверка на ввод числа
         if check_is_float(el):
             array_out.append(float(el))
         else:
             print(f'\033[31m\033[1mЭлемент {el} не является числом и поэтому был исключен из массива\033[0m')
-    if len(array_out) == 0:
+    if len(array_out) == 0:  # если массив пустой, то выводим ошибку
         print('\033[31m\033[1mВнимание! В массиве нет чисел\033[0m')
     return array_out
 
 
-def binary_search(array, elem, start=0, end=0):
-    if end == 0:
+def binary_search(array: list, elem: float, start: int = 0, end: int = 0) -> int:  # бинарный поиск
+    if end == 0:  # если конец не задан, то задаем его
         end = len(array)
-    if elem < array[0]:
-        return 0
-    if elem >= array[end - 1]:
+    if elem < array[start]:  # если элемент меньше первого, то возвращаем первый индекс
+        return start
+    elif elem >= array[end - 1]:  # если элемент больше последнего, то возвращаем последний индекс
         return end
     index = end // 2
-    if array[index] == elem:
+    if array[index] == elem:  # если элемент равен элементу по индексу, то возвращаем индекс
         return index + 1
-    elif array[index] > elem:
+    elif array[index] > elem:  # если элемент больше элемента по индексу, то сдвигаем конец
         high_index = index
-        low_index = 0
+        low_index = start
     else:
         high_index = end - 1
         low_index = index
-    while high_index - low_index != 1:
+    while high_index - low_index != 1:  # пока разница между индексами не равна 1
         index = (high_index + low_index) // 2
         array_by_index = array[index]
         if array_by_index > elem:
@@ -95,12 +95,12 @@ def binary_search(array, elem, start=0, end=0):
     return high_index
 
 
-def insert_binary_sort(array):
+def insert_binary_sort(array: list) -> tuple[list, int]:  # сортировка вставками
     cnt = 0
-    for barier in range(len(array) - 1):
+    for barier in range(len(array) - 1):  # перебираем элементы
         new_element = array[barier + 1]
         new_index = binary_search(array, new_element, end=barier + 1)
-        for i in range(barier + 1, new_index, -1):
+        for i in range(barier + 1, new_index, -1):  # сдвигаем элементы
             cnt += 1
             temporary_elem = array[i]
             array[i] = array[i - 1]
@@ -109,53 +109,64 @@ def insert_binary_sort(array):
     return array, cnt
 
 
-def print_array(array):
+def print_array(array: list) -> None:  # вывод массива
     for el in array:
         print(f'{el:.7g}', end=' ')
     print()
 
 
-def print_table(times_r, cnt_r, times_p, cnt_p, times_n, cnt_n, N):
+def print_table(times_r: list[float], cnt_r: list[int], times_p: list[float], cnt_p: list[int], times_n: list[float],
+                cnt_n: list[int], N: list[float, float, float]) -> None:  # вывод таблицы
     print(
-        '+----------------------+------------------------------+------------------------------+------------------------------+')
+        '+----------------------+------------------------------+'
+        '------------------------------+------------------------------+')
     print(f'| Размерность массива: | {float(N[0]):^28.5g} | {float(N[1]):^28.5g} | {float(N[2]):^28.5g} |')
     print(
-        '+----------------------|-------------+----------------|-------------+----------------|-------------+----------------+')
+        '+----------------------|-------------+----------------|'
+        '-------------+----------------|-------------+----------------+')
     print(
-        '|                      |    Время    |  Перестановки  |    Время    |  Перестановки  |    Время    |  Перестановки  |')
+        '|                      |    Время    |  Перестановки  |'
+        '    Время    |  Перестановки  |    Время    |  Перестановки  |')
     print(
-        '+----------------------|-------------+----------------|-------------+----------------|-------------+----------------+')
+        '+----------------------|-------------+----------------|'
+        '-------------+----------------|-------------+----------------+')
     print('| Упорядоченный список |', end='')
     for i in range(3):
         print(f' {times_p[i]:^11.5g} | {cnt_p[i]:^14.7g} |', end='')
     print(
-        '\n+----------------------|-------------+----------------|-------------+----------------|-------------+----------------+')
+        '\n+----------------------|-------------+----------------|'
+        '-------------+----------------|-------------+----------------+')
 
     print('|   Случайный список   |', end='')
     for i in range(3):
         print(f' {times_r[i]:^11.5g} | {cnt_r[i]:^14.7g} |', end='')
     print(
-        '\n+----------------------|-------------+----------------|-------------+----------------|-------------+----------------+')
+        '\n'
+        '+----------------------|-------------+----------------|'
+        '-------------+----------------|-------------+----------------+')
 
     print('|    Упорядоченный     |', end='')
     for i in range(3):
         print(f' {times_n[i]:^11.5g} | {cnt_n[i]:^14.7g} |', end='')
     print('\n'
-          '|  в обратном порядке  |             |                |             |                |             |                |')
+          '|  в обратном порядке  |             |                |'
+          '             |                |             |       '
+          '         |')
     print(
-        '+----------------------+-------------+----------------+-------------+----------------+-------------+----------------+')
+        '+----------------------+-------------+----------------+'
+        '-------------+----------------+-------------+----------------+')
 
 
 def main():
-    array = input_array()
+    array = input_array()  # ввод массива
     print()
-    if array != []:
-        print("Отсортированный методом бинарной вставки массив:")
+    if array:
+        print("Отсортированный методом бинарной вставки массив:")  # вывод отсортированного массива
         print_array(insert_binary_sort(array)[0])
     print()
 
     N = []
-    for i in range(1, 4):
+    for i in range(1, 4):  # ввод размерностей массивов
         print(f'Введите размерность {i} массива.')
         N.append(int(input()))
     print()
@@ -168,12 +179,12 @@ def main():
     cnt_positive = []
     cnt_negative = []
 
-    for qty in N:
+    for qty in N:  # перебираем размерности
         random_array = [randint(-qty, qty) for _ in range(qty)]
         positive_array = list(range(qty))
         negative_array = list(range(qty, 0, -1))
 
-        t = time()
+        t = time()  # считаем время
         cnt_rand = insert_binary_sort(random_array)[1]
         time_rand = time() - t
 
@@ -185,11 +196,11 @@ def main():
         cnt_neg = insert_binary_sort(negative_array)[1]
         time_neg = time() - t
 
-        cnt_positive.append(cnt_pos)
+        cnt_positive.append(cnt_pos)  # добавляем количество перестановок
         cnt_random.append(cnt_rand)
         cnt_negative.append(cnt_neg)
 
-        time_negative.append(time_neg)
+        time_negative.append(time_neg)  # добавляем время
         time_random.append(time_rand)
         time_positive.append(time_pos)
 
@@ -198,6 +209,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    t = time()
-    print(binary_search(list(range(1000000)), 333333, end=000000000))
-    print(time() - t)
