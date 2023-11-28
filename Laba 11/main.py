@@ -1,6 +1,6 @@
 from time import time
-from random import randint
-
+from random import shuffle
+from sorts import insert_binary_sort as sorting
 
 def check_is_float(x: str) -> bool:  # проверка на ввод числа
     flag_digit = 0
@@ -67,47 +67,6 @@ def input_array() -> list:
     return array_out
 
 
-def binary_search(array: list, elem: float, start: int = 0, end: int = 0) -> int:  # бинарный поиск
-    if end == 0:  # если конец не задан, то задаем его
-        end = len(array)
-    if elem < array[start]:  # если элемент меньше первого, то возвращаем первый индекс
-        return start
-    elif elem >= array[end - 1]:  # если элемент больше последнего, то возвращаем последний индекс
-        return end
-    index = end // 2
-    if array[index] == elem:  # если элемент равен элементу по индексу, то возвращаем индекс
-        return index + 1
-    elif array[index] > elem:  # если элемент больше элемента по индексу, то сдвигаем конец
-        high_index = index
-        low_index = start
-    else:
-        high_index = end - 1
-        low_index = index
-    while high_index - low_index != 1:  # пока разница между индексами не равна 1
-        index = (high_index + low_index) // 2
-        array_by_index = array[index]
-        if array_by_index > elem:
-            high_index = index
-        elif array_by_index < elem:
-            low_index = index
-        else:
-            return index + 1
-    return high_index
-
-
-def insert_binary_sort(array: list) -> tuple[list, int]:  # сортировка вставками
-    cnt = 0
-    for barier in range(len(array) - 1):  # перебираем элементы
-        new_element = array[barier + 1]
-        new_index = binary_search(array, new_element, end=barier + 1)
-        for i in range(barier + 1, new_index, -1):  # сдвигаем элементы
-            cnt += 1
-            temporary_elem = array[i]
-            array[i] = array[i - 1]
-            array[i - 1] = temporary_elem
-        array[new_index] = new_element
-    return array, cnt
-
 
 def print_array(array: list) -> None:  # вывод массива
     for el in array:
@@ -161,8 +120,10 @@ def main():
     array = input_array()  # ввод массива
     print()
     if array:
-        print("Отсортированный методом бинарной вставки массив:")  # вывод отсортированного массива
-        print_array(insert_binary_sort(array)[0])
+        print("Отсортированный массив:")  # вывод отсортированного массива
+        array = sorting(array)
+        print_array(array[0])
+        print('Количество перестановок:',array[1])
     print()
 
     N = []
@@ -180,20 +141,24 @@ def main():
     cnt_negative = []
 
     for qty in N:  # перебираем размерности
-        random_array = [randint(-qty, qty) for _ in range(qty)]
+        random_array = list(range(qty))
+        shuffle(random_array)
         positive_array = list(range(qty))
         negative_array = list(range(qty, 0, -1))
 
+        print(random_array)
         t = time()  # считаем время
-        cnt_rand = insert_binary_sort(random_array)[1]
+        cnt_rand = sorting(random_array)
         time_rand = time() - t
+        print(cnt_rand)
+        cnt_rand = cnt_rand[1]
 
         t = time()
-        cnt_pos = insert_binary_sort(positive_array)[1]
+        cnt_pos = sorting(positive_array)
         time_pos = time() - t
 
         t = time()
-        cnt_neg = insert_binary_sort(negative_array)[1]
+        cnt_neg = sorting(negative_array)[1]
         time_neg = time() - t
 
         cnt_positive.append(cnt_pos)  # добавляем количество перестановок
