@@ -81,6 +81,7 @@ def gnome_sort(array):
     return array, cnt
 
 
+
 def simply_insert_sort(array):
     cnt = 0
     ln = len(array)-1
