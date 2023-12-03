@@ -119,22 +119,47 @@ def shell_sort(array):
     cnt = 0
     while delta > 0:
 
-        for i in range(delta, ln):
-            k = 1
-            while i - k*delta>=0:
+        for i in range(0, ln):
+            while i - delta >= 0:
                 j = i - delta
                 if array[i] < array[j]:
                     temp_elem = array[j]
                     array[j] = array[i]
                     array[i] = temp_elem
                     cnt += 1
+                else: break
                 i = j
-                k += 1
         delta = int(delta*0.618)
 
     return array, cnt
 
 
+def heapify(array, n, i, cnt):
+    largest = i
+    l = 2 * i + 1
+    r = 2 * i + 2
+
+    if l < n and array[i] < array[l]:
+        largest = l
+    if r < n and array[largest] < array[r]:
+        largest = r
+
+    if largest != i:
+        cnt += 1
+        array[i], array[largest] = array[largest], array[i]
+        heapify(array, n, largest, cnt)
+
+
+def heap_sort(array):
+    cnt = 0
+    n = len(array)
+    for i in range(n // 2, -1, -1):
+        heapify(array, n, i, cnt)
+    for i in range(n - 1, 0, -1):
+        array[i], array[0] = array[0], array[i]
+        cnt += 1
+        heapify(array, i, 0, cnt)
+    return array, cnt
 
 def insert_binary_sort(array: list) -> tuple[list, int]:  # сортировка вставками
     cnt = 0

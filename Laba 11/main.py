@@ -1,6 +1,6 @@
 from time import time
 from random import shuffle
-from sorts import insert_binary_sort as sorting
+from sorts import heap_sort as sorting
 
 def check_is_float(x: str) -> bool:  # проверка на ввод числа
     flag_digit = 0
@@ -154,7 +154,7 @@ def main():
         cnt_rand = cnt_rand[1]
 
         t = time()
-        cnt_pos = sorting(positive_array)
+        cnt_pos = sorting(positive_array)[1]
         time_pos = time() - t
 
         t = time()
