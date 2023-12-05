@@ -25,6 +25,7 @@ def to_left(text):
 
 
 def to_right(text):
+    text = to_left(text)
     ln = [len(i) for i in text]
     linemx = max(ln)
     for line in range(len(text)):
@@ -33,6 +34,7 @@ def to_right(text):
 
 
 def to_wide(text: list[str]):
+    text = to_left(text)
     ln = max([len(i) for i in text])
     for line in range(len(text)):
         delta = ln - len(text[line].replace(' ', ''))
@@ -52,109 +54,163 @@ def to_mid(text: list[str]):
 
 def delete_word(text: list[str]):
     word = input('Введите слово, которое следует удалить: ').strip()
+    print()
+    while len(word)==0:
+        print('Вы не ввели слово')
+        word = input('Введите слово, которое следует удалить: ').strip()
+
     flag = 0
     for line in range(len(text)):
-        if word in text[line]:
-            text[line] = text[line].replace(word, '')
-            flag += 1
+        text[line], cnt = replace_word_by_index(text[line], word, '')
+        flag += cnt
     if not flag:
         print(f'Слово "{word}" не было обнаружено')
     else:
         print(f'Удалено {flag} слов')
     return text
 
+def analyze_text(text: list[str]):
+    letters = ('QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмитьбю'
+               'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёЁ01234567890')
+
+    change = 1
+    while change:
+        change = 0
+        if '' in text:
+            text.remove('')
+            change = 1
+            # print('найдена пустая строка')
+
+        for line in range(len(text)):
+            # print("обработка", line,"строки")
+            for sym in range(len(text[line])-1):
+                a = text[line][sym]
+                b = text[line][sym+1]
+                if sym!=0 and sym != (len(text[line]) - 2)and ((text[line][sym-1]==a==b=='!') != (a==b==text[line][sym+2]=='!')):
+                    # print("заметили 3 восклиц знака")
+                    # print(text[line][sym-2:sym+3])
+                    continue
+
+                # if line ==1: print(text[line][sym-1:sym+3],a,b, a==b,sym,sym+1, text[line][sym+4], text[line][sym+5]); return text
+                if a == b and a not in letters:
+                    text[line] = text[line].replace(a+b,a,1)
+                    change = 1
+                    # print("найдены совпадающие символы ",a,b,sym)
+                    break
+                if a in '!?' and b not in letters and b not in '!? ':
+                    text[line] = text[line][:sym+1] + text[line][sym + 2:]
+                    change = 1
+                    break
+                if a not in letters and not(a=='?' and b=='!') and (b == '.' or b == '!' or b == '?'):
+                    text[line] = text[line][:sym]+text[line][sym+1:]
+                    change = 1
+                    break
+            for sym in range(len(text[line])-2):
+                a = text[line][sym]
+                b = text[line][sym+1]
+                c = text[line][sym+2]
+                if a in letters and b == ' ' and c not in letters:
+                    text[line] = text[line][:sym+1]+text[line][sym+2:]
+                    change = 1
+                    # print("Найден лишний пробел", a, b, c)
+                    break
+    return text
+
+
 
 def replace_word(text: list[str]):
     word = input('Введите слово, которое следует заменить: ').strip()
+    while len(word)==0:
+        print('Вы не ввели слово')
+        word = input('Введите слово, которое следует заменить: ').strip()
     new_word = input('Введите слово, которое следует вставить на место удаленного: ').strip()
+    print()
+    while len(new_word) == 0:
+        print('Вы не ввели слово')
+        new_word = input('Введите слово, которое следует вставить на место удаленного: ').strip()
     flag = 0
 
     for line in range(len(text)):
-        matched_word = match_word(text[line], word)
-        while matched_word!='':
-            text[line] = text[line].replace(matched_word, matched_word[0]+new_word+matched_word[-1],1)
-            flag+=1
-            matched_word = match_word(text[line],word)
+        text[line],cnt = replace_word_by_index(text[line],word,new_word)
+        flag+=cnt
     if not flag:
         print(f'Слово "{word}" не было обнаружено')
     else:
         print(f'Заменено {flag} слов')
     return text
 
-def match_word(line: str, word: str):
-    print("Поиск:", word)
-    if word in line:
-        not_allowed_sym = ('QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмитьбю'
-                           'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ')
-        new_word = word
-        pos = line.find(word)
-        if pos != 0:
-            if line[pos-1] not in not_allowed_sym:
-                new_word = line[pos-1] + new_word
-            else:
-                print("Слово является частью", line[pos-1] + new_word)
-                return ''
-        if pos + len(word) < len(line):
-            if line[pos + len(word)] not in not_allowed_sym:
-                new_word = new_word + line[pos + len(word)]
-            else:
-                print("Слово является частью", new_word + line[pos + len(word)])
-                return ''
-        print("Слово найдено:", new_word)
-        return new_word
-    else:
-        print('Слово не найдено в строке')
-        return ''
 
-def replace_word_by_index(text: list(str), word, new_word):
 
-def match_word_index(line: str, word: str):
-    print("Поиск:", word)
-    if word in line:
-        not_allowed_sym = ('QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмитьбю'
-                           'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ')
-        new_word = word
-        pos = line.find(word)
-        if pos != 0 and line[pos-1] in not_allowed_sym:
-            return -1
-        if pos + len(word) < len(line) and line[pos + len(word)] in not_allowed_sym:
-            return -1
-        print("Слово найдено:", new_word)
+def replace_word_by_index(line: str, word: str, new_word: str, start_index: int = 0):
+    pos = match_word_index(line, word,start_index)
+    cnt=0
+    while pos != -1:
+        line = line[:pos]+new_word+line[pos+len(word):]
+        pos = match_word_index(line,word,pos + len(new_word))
+        cnt+=1
+    return line, cnt
+
+def match_word_index(line: str, word: str, index: int = 0):
+    if index == -1 or index > (len(line) - len(word)):
+        # print("превышение")
+        return -1
+    # print("Поиск:", word)
+    pos = line.find(word,index)
+    if pos != -1 :
+        # print(pos, index, line)
+        letters = ('QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмитьбю'
+                           'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёЁ-')
+
+        if pos != 0 and line[pos-1] in letters:
+            # print("Что не удовлетворило спереди:"+line[pos-1])
+            return match_word_index(line, word, pos+1)
+        if pos + len(word) < len(line) and line[pos + len(word)] in letters:
+            # print("Что не удовлетворило posle:"+line[pos + len(word)])
+            return match_word_index(line, word, pos+1)
+        # print("Слово найдено:", pos)
         return pos
     else:
-        print('Слово не найдено в строке')
+        # print('Слово не найдено в строке')
         return -1
 
+
 def print_text(text: list[str]):
+    print()
     for line in text:
         print(line)
+    print()
+
 
 def main(text):
     print_text(text)
     ans = menu()
+    type_of_output = 1
     while ans!=0:
         if ans == '1':
-            text = to_left(text)
-            print_text(text)
+            type_of_output = 1
         if ans == '2':
-            text = to_right(text)
-            print_text(text)
+            type_of_output = 2
         if ans == '3':
-            text = to_wide(text)
-            print_text(text)
+            type_of_output = 3
         if ans == '4':
             text = delete_word(text)
-            print_text(text)
         if ans == '5':
             text = replace_word(text)
-            print_text(text)
         if ans == '6':
             text = to_right(text)
+            text = analyze_text(text)
             print_text(text)
         if ans == '7':
             text = to_right(text)
             print_text(text)
 
+        text = analyze_text(text)
+        if type_of_output == 1:
+            print_text(to_left(text))
+        elif type_of_output == 2:
+            print_text(to_right(text))
+        else:
+            print_text(to_wide(text))
         ans = menu()
 
     print('Выход из программы')
