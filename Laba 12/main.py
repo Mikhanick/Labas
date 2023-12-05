@@ -68,35 +68,69 @@ def replace_word(text: list[str]):
     word = input('Введите слово, которое следует заменить: ').strip()
     new_word = input('Введите слово, которое следует вставить на место удаленного: ').strip()
     flag = 0
-    letters = ('QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмитьбюЙЦУКЕНГШЩЗХЪФЫВА'
-               'ПРОЛДЖЭЯЧСМИТЬБЮ')
+
     for line in range(len(text)):
-        pos_to_replace = text[line].find(word)
-        print(pos_to_replace)
-        while (pos_to_replace!=-1 and (pos_to_replace==0 or text[line][pos_to_replace-1] not in letters)
-               and ((pos_to_replace+len(word)==(len(text[line]))) or text[line][pos_to_replace+len(word)])):
-            print(text[line][pos_to_replace-1])
-            if pos_to_replace!=0:
-                word = text[line][pos_to_replace-1]+word
-                new_word = text[line][pos_to_replace-1]+new_word
-            if (pos_to_replace+len(word))==len(text[line]):
-                word = word+text[line][pos_to_replace+len(word)]
-                new_word = new_word+text[line][pos_to_replace+len(word)]
-            text[line] = text[line].replace(word, new_word)
-            pos_to_replace = text[line].find(word,pos_to_replace+1)
-            flag += 1
+        matched_word = match_word(text[line], word)
+        while matched_word!='':
+            text[line] = text[line].replace(matched_word, matched_word[0]+new_word+matched_word[-1],1)
+            flag+=1
+            matched_word = match_word(text[line],word)
     if not flag:
         print(f'Слово "{word}" не было обнаружено')
     else:
         print(f'Заменено {flag} слов')
     return text
 
+def match_word(line: str, word: str):
+    print("Поиск:", word)
+    if word in line:
+        not_allowed_sym = ('QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмитьбю'
+                           'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ')
+        new_word = word
+        pos = line.find(word)
+        if pos != 0:
+            if line[pos-1] not in not_allowed_sym:
+                new_word = line[pos-1] + new_word
+            else:
+                print("Слово является частью", line[pos-1] + new_word)
+                return ''
+        if pos + len(word) < len(line):
+            if line[pos + len(word)] not in not_allowed_sym:
+                new_word = new_word + line[pos + len(word)]
+            else:
+                print("Слово является частью", new_word + line[pos + len(word)])
+                return ''
+        print("Слово найдено:", new_word)
+        return new_word
+    else:
+        print('Слово не найдено в строке')
+        return ''
+
+def replace_word_by_index(text: list(str), word, new_word):
+
+def match_word_index(line: str, word: str):
+    print("Поиск:", word)
+    if word in line:
+        not_allowed_sym = ('QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмитьбю'
+                           'ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ')
+        new_word = word
+        pos = line.find(word)
+        if pos != 0 and line[pos-1] in not_allowed_sym:
+            return -1
+        if pos + len(word) < len(line) and line[pos + len(word)] in not_allowed_sym:
+            return -1
+        print("Слово найдено:", new_word)
+        return pos
+    else:
+        print('Слово не найдено в строке')
+        return -1
 
 def print_text(text: list[str]):
     for line in text:
         print(line)
 
 def main(text):
+    print_text(text)
     ans = menu()
     while ans!=0:
         if ans == '1':
