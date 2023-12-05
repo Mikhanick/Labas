@@ -25,7 +25,6 @@ def to_left(text):
 
 
 def to_right(text):
-    text = to_left(text)
     ln = [len(i) for i in text]
     linemx = max(ln)
     for line in range(len(text)):
@@ -76,9 +75,11 @@ def analyze_text(text: list[str]):
     change = 1
     while change:
         change = 0
-        if '' in text:
-            text.remove('')
-            change = 1
+        for line in range(len(text)):
+            if text[line] == '' or set(text[line]) == set(' '):
+                text.pop(line)
+                change = 1
+                break
             # print('найдена пустая строка')
 
         for line in range(len(text)):
@@ -116,7 +117,80 @@ def analyze_text(text: list[str]):
                     break
     return text
 
+def count_expression(expression:str):
+    print(expression)
+    if '+' in expression:
+        return str(sum(map(int, expression.split('+'))))
+    else:
+        if expression.count('-') == 0 or expression[0] == '-':
+            return expression
+        elif expression.count('-') == 1:
+            num1, num2 = (map(int, expression.split('-')))
+            return str(num1-num2)
+        else:
+            return str(int(expression[:expression.rfind('-')]) - int(expression[expression.rfind('-')+1:]))
 
+def search_arithmetic(line):
+    expression = ''
+    flag_to_count = 0
+    start = -1
+    end = -1
+    expressions_to_replace = []
+    for index, sym in enumerate(line):
+        if sym in '-1234567890' and expression == '':
+            expression+=sym
+            start = index
+        elif sym == ' ' and (line[max(0,index-1)] in '1234567890' and line[min(len(line)-1,index+1)] in '-+' or line[min(len(line)-1,index+1)] in '1234567890' and line[max(0,index-1)] in '-+'):
+            pass
+        elif sym in '1234567890':
+            expression+=sym
+        elif sym in '-+' and expression!='' and expression[-1] in '1234567890':
+            if flag_to_count:
+                expression = count_expression(expression)
+                expression+=sym
+            else:
+                expression+=sym
+            flag_to_count=1
+        else:
+            sym_left = 0
+            if expression!='' and (expression[-1] == '-' or expression[-1] == '+'):
+                expression = expression[:-1]
+                sym_left +=1
+            if expression!='' and expression[0]=='+':
+                expression = expression[1:]
+                sym_left+=1
+            if expression != '':
+                expression = count_expression(expression)
+                if line[start:index] != expression:
+                    expressions_to_replace.append([line[start:index-sym_left], expression])
+                if sym in '-1234567890' and expression == '':
+                    expression += sym
+                    start = index
+                else: expression = ''
+    sym_left = 0
+    if expression != '' and (expression[-1] == '-' or expression[-1] == '+'):
+        expression = expression[:-1]
+        sym_left += 1
+    if expression != '' and expression[0] == '+':
+        expression = expression[1:]
+        sym_left += 1
+    if expression != '':
+        expression = count_expression(expression)
+        if line[start:] != expression:
+            expressions_to_replace.append([line[start:len(line)-sym_left], expression])
+    return expressions_to_replace
+
+def arithmetical(text: list[str]):
+    cnt = 0
+    for index in range(len(text)):
+        for old, new in search_arithmetic(text[index]):
+            print(old,new)
+            new_string = text[index].replace(old, new, 1)
+            text[index] = new_string
+            print(text[index])
+            cnt+=1
+    print(f'Произведено {cnt} арифметических операций')
+    return text
 
 def replace_word(text: list[str]):
     word = input('Введите слово, которое следует заменить: ').strip()
@@ -197,20 +271,19 @@ def main(text):
         if ans == '5':
             text = replace_word(text)
         if ans == '6':
-            text = to_right(text)
-            text = analyze_text(text)
-            print_text(text)
+            text = arithmetical(text)
         if ans == '7':
             text = to_right(text)
             print_text(text)
-
+        if ans == '0':
+            break
         text = analyze_text(text)
         if type_of_output == 1:
-            print_text(to_left(text))
+            print_text(to_left(text.copy()))
         elif type_of_output == 2:
-            print_text(to_right(text))
+            print_text(to_right(text.copy()))
         else:
-            print_text(to_wide(text))
+            print_text(to_wide(text.copy()))
         ans = menu()
 
     print('Выход из программы')
