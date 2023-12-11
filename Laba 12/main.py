@@ -40,7 +40,13 @@ def to_wide(text: list[str]):
         k = delta // (max(len(text[line].split())-1,1))
         space = ' ' * max(1, k)
         text[line] = space.join(text[line].split())
-    return to_mid(text)
+        for word in text[line].split():
+            if len(text[line]) == ln:
+                break
+            text[line] = text[line].replace(word,word+' ',1)
+
+
+    return text
 
 
 def to_mid(text: list[str]):
@@ -144,6 +150,8 @@ def search_arithmetic(line):
             pass
         elif sym in '1234567890':
             expression+=sym
+        elif sym == '-' and expression[-1]=='+':
+            expression+=sym
         elif sym in '-+' and expression!='' and expression[-1] in '1234567890':
             if flag_to_count:
                 expression = count_expression(expression)
@@ -152,10 +160,14 @@ def search_arithmetic(line):
                 expression+=sym
             flag_to_count=1
         else:
+            new_expression = ''
             sym_left = 0
             if expression!='' and (expression[-1] == '-' or expression[-1] == '+'):
+                if expression == '-':
+                    new_expression += expression[-1]
                 expression = expression[:-1]
                 sym_left +=1
+
             if expression!='' and expression[0]=='+':
                 expression = expression[1:]
                 sym_left+=1
@@ -166,7 +178,7 @@ def search_arithmetic(line):
                 if sym in '-1234567890' and expression == '':
                     expression += sym
                     start = index
-                else: expression = ''
+                else: expression = new_expression
     sym_left = 0
     if expression != '' and (expression[-1] == '-' or expression[-1] == '+'):
         expression = expression[:-1]
@@ -248,9 +260,49 @@ def match_word_index(line: str, word: str, index: int = 0):
         return -1
 
 def find_sentence(text: list[str]):
-    for line in text:
-        for sym in line:
-            if sym!=
+
+    interesting_sym = input('Введите символ, для поиска предложения в котором максимальное количество слов начинается'
+                            'на этот символ: ')
+    while len(interesting_sym)!=1:
+        print('Вы ввели не один символ, повторите попытку!')
+        interesting_sym = input()
+    position_of_sentence = []
+    k = 0
+    max_k = 0
+    start_of_this_sentence = [0,0]
+    for index_line, line in enumerate(text):
+        for sym in range(1, len(line)):
+            if line[sym-1] == ' ' and line[sym] == interesting_sym:
+                k+=1
+            if line[sym-1] == '.':
+                if k>max_k:
+                    position_of_sentence = [start_of_this_sentence,[index_line,sym]]
+                    max_k = k
+                k=0
+                start_of_this_sentence = [index_line,sym]
+    if position_of_sentence == []:
+        print('Необходимое предложение не найдено')
+        return text
+
+    else:
+        print(f"В предложении найдено {max_k} слов на букву {interesting_sym}\n")
+        for line in range(position_of_sentence[0][0],position_of_sentence[1][0]+1):
+            if line != position_of_sentence[0][0] and line != position_of_sentence[1][0]:
+                print(text[line])
+                text[line]=''
+            else:
+                if position_of_sentence[0][0] == position_of_sentence[1][0]:
+                    print(text[line][position_of_sentence[0][1]:position_of_sentence[1][1]+1])
+                    text[line] = text[line][:position_of_sentence[0][1]]+text[line][position_of_sentence[1][1]+1:]
+                elif line == position_of_sentence[0][0]:
+                    print(text[line][position_of_sentence[0][1]:])
+                    text[line] = text[line][:position_of_sentence[0][1]]
+                else:
+                    print(text[line][:position_of_sentence[1][1]+1])
+                    text[line]=text[line][position_of_sentence[1][1]+1:]
+        return text
+
+
 
 def print_text(text: list[str]):
     print()
@@ -262,10 +314,17 @@ def print_text(text: list[str]):
 
 
 def main(text):
+    text = analyze_text(text)
+    if text == []:
+        print("Текст пуст, выполнение программы завершено.")
+        return 0
     print_text(text)
     ans = menu()
     type_of_output = 1
     while ans!=0:
+        if text == []:
+            print("Текст пуст, выполнение программы завершено.")
+            return 0
         if ans == '1':
             type_of_output = 1
         if ans == '2':
@@ -279,8 +338,7 @@ def main(text):
         if ans == '6':
             text = arithmetical(text)
         if ans == '7':
-            text = to_right(text)
-            print_text(text)
+            text = find_sentence(text)
         if ans == '0':
             break
         text = analyze_text(text)
@@ -293,6 +351,7 @@ def main(text):
         ans = menu()
 
     print('Выход из программы')
+    return 0
 
 if __name__ == '__main__':
     main(text)
