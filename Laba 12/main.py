@@ -110,7 +110,7 @@ def analyze_text(text: list[str]):
                 a = text[line][sym]
                 b = text[line][sym+1]
                 c = text[line][sym+2]
-                if a in letters and b == ' ' and c not in letters:
+                if a in letters and b == ' ' and c not in letters and c not in "-+":
                     text[line] = text[line][:sym+1]+text[line][sym+2:]
                     change = 1
                     # print("Найден лишний пробел", a, b, c)
@@ -118,11 +118,11 @@ def analyze_text(text: list[str]):
     return text
 
 def count_expression(expression:str):
-    print(expression)
+    # print(expression)
     if '+' in expression:
         return str(sum(map(int, expression.split('+'))))
     else:
-        if expression.count('-') == 0 or expression[0] == '-':
+        if expression.count('-') == 0 or expression[0] == '-' and expression.count("-") == 1:
             return expression
         elif expression.count('-') == 1:
             num1, num2 = (map(int, expression.split('-')))
@@ -161,8 +161,8 @@ def search_arithmetic(line):
                 sym_left+=1
             if expression != '':
                 expression = count_expression(expression)
-                if line[start:index] != expression:
-                    expressions_to_replace.append([line[start:index-sym_left], expression])
+                if line[start:index-sym_left-1] != expression:
+                    expressions_to_replace.append([line[start:index-sym_left].strip(), expression])
                 if sym in '-1234567890' and expression == '':
                     expression += sym
                     start = index
@@ -184,10 +184,10 @@ def arithmetical(text: list[str]):
     cnt = 0
     for index in range(len(text)):
         for old, new in search_arithmetic(text[index]):
-            print(old,new)
+            # print(old,new)
             new_string = text[index].replace(old, new, 1)
             text[index] = new_string
-            print(text[index])
+            # print(text[index])
             cnt+=1
     print(f'Произведено {cnt} арифметических операций')
     return text
@@ -247,6 +247,10 @@ def match_word_index(line: str, word: str, index: int = 0):
         # print('Слово не найдено в строке')
         return -1
 
+def find_sentence(text: list[str]):
+    for line in text:
+        for sym in line:
+            if sym!=
 
 def print_text(text: list[str]):
     print()
