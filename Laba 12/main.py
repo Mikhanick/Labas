@@ -259,6 +259,8 @@ def print_text(text: list[str]):
     print()
 
 
+
+
 def main(text):
     print_text(text)
     ans = menu()
