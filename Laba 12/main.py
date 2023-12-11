@@ -1,8 +1,12 @@
+# Саватеев Михаил группа ИУ7-16Б
+# Лабораторная работа номер 11
+# Варианты: Сложение и вычитание, удаление предложения, в котором наиболее количество слов начинается на заданную букву
+
 from text import text
 import math
 
 
-def menu():
+def menu() -> str: # меню, возвращает номер варианта ответа пользователя
     print('###################################')
     print('1. Выровнять текст по левому краю.')
     print('2. Выровнять текст по правому краю.')
@@ -18,13 +22,13 @@ def menu():
         print('Некорректный ввод, повторите попытку')
         inp = input()
     return inp
-def to_left(text):
+def to_left(text): # выравнивание текста по левому краю
     for line in range(len(text)):
         text[line] = ' '.join(text[line].split())
     return text
 
 
-def to_right(text):
+def to_right(text): # выравнивание текста по правому краю
     ln = [len(i) for i in text]
     linemx = max(ln)
     for line in range(len(text)):
@@ -32,7 +36,7 @@ def to_right(text):
     return text
 
 
-def to_wide(text: list[str]):
+def to_wide(text: list[str]): # выравнивание текста по левому краю
     text = to_left(text)
     ln = max([len(i) for i in text])
     for line in range(len(text)):
