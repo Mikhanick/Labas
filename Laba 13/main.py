@@ -132,35 +132,39 @@ def find_last_number(name, separator_in_file='!¤!'):  # поиск послед
                 f.seek(-2, os.SEEK_CUR)  # Переходим на предыдущий символ, пока не наткнемся на \n или начало файла
         except OSError:
             f.seek(0)
-        last_line = f.readline().decode()  # Последняя строка
+        last_line = f.readline().decode(encoding='UTF-8')  # Последняя строка
     return last_line.split(separator_in_file)[0]  # возвращаем последний номер
 
 
 def print_db(name, separator_in_file='!¤!'):  # вывод базы данных
-    with open(name, 'r', encoding='UTF-8') as file:
-        print('База данных:')
-        print(
-            '+-----+---------------------------+-------------------------+--------------------------+--------------+--'
-            '-----------------------+')
-        print(
-            '|  №  |          Группа           |          Песня          |          Альбом          | Год создания |'
-            ' Длительность в секундах |')
-        print(
-            '+-----+---------------------------+-------------------------+--------------------------+--------------+'
-            '-------------------------+')
-        for line in file:  # вывод данных построчно
+    try:
+        with open(name, 'r', encoding='UTF-8') as file:
+            print('База данных:')
+            print(
+                '+-----+---------------------------+-------------------------+--------------------------+--------------+--'
+                '-----------------------+')
+            print(
+                '|  №  |          Группа           |          Песня          |          Альбом          | Год создания |'
+                ' Длительность в секундах |')
+            print(
+                '+-----+---------------------------+-------------------------+--------------------------+--------------+'
+                '-------------------------+')
+            for line in file:  # вывод данных построчно
 
-            array = line.split(separator_in_file)
-            if len(array) != 6:
-                text = '" '+'|'.join(array)+ ' "'
-                print(
-                    f'Ошибка чтения файла {name} в строке {text} \nИспользуйте другой файл или инициализируйте этот повторно.')
-                return 1
-            print(f'|{array[0]:^5}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5][:-1]:^25}|')
-        print(
-            '+-----+---------------------------+-------------------------+--------------------------+--------------+--'
-            '-----------------------+')
-    print(f'Всего записей: {array[0]}')
+                array = line.split(separator_in_file)
+                if len(array) != 6:
+                    text = '" '+'|'.join(array)+ ' "'
+                    print(
+                        f'Ошибка чтения файла {name} в строке {text} \nИспользуйте другой файл или инициализируйте этот повторно.')
+                    return 1
+                print(f'|{array[0]:^5}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5][:-1]:^25}|')
+            print(
+                '+-----+---------------------------+-------------------------+--------------------------+--------------+--'
+                '-----------------------+')
+        print(f'Всего записей: {array[0]}')
+    except UnicodeDecodeError:
+        print(f'Ошибка чтения файла {name}. Используйте другой файл или инициализируйте этот повторно.')
+        return 1
     return 0
 
 
@@ -171,6 +175,10 @@ def add_to_the_end_of_db(name, separator_in_file='!¤!',empty_file=1):  # доб
     else:
         try:
             n = int(find_last_number(name, separator_in_file))  # находим последний номер
+        except UnicodeDecodeError:
+            print(f'Ошибка чтения файла {name} из-за неправильной кодировки. '
+                  f'Используйте другой файл или инициализируйте этот повторно.')
+            return 1
         except Exception:
             print('Ошибка чтения базы данных. Используйте другой файл или инициализируйте этот повторно.')
             return 1
@@ -303,9 +311,10 @@ def search_by_two_fields(name, separator_in_file='!¤!'):  # поиск по д�
 
 
 def main():
-    file_chosed = 0  # 0 - файл не выбран, 1 - файл выбран, доступен только для записи,
+    SEPARATOR_IN_FILE = '!¤!'
+    file_selected = 0  # 0 - файл не выбран, 1 - файл выбран, доступен только для записи,
     # 2 - файл выбран, доступен для чтения
-    ans = menu(file_chosed)
+    ans = menu(file_selected)
     return_code = 0
     file_name = ''
     while ans != '0':
@@ -313,49 +322,49 @@ def main():
             if ans == '1':
                 file = choosing_file()
                 if file:
-                    file_chosed = file[1] + 1
+                    file_selected = file[1] + 1
                     file_name = file[0]
             elif ans == '2':
-                if file_chosed > 0:
-                    initialize_db(file_name)
-                    file_chosed = 2
+                if file_selected > 0:
+                    initialize_db(file_name,separator_in_file=SEPARATOR_IN_FILE)
+                    file_selected = 2
                 else:
                     print('Файл не выбран')
             elif ans == '3':
-                if file_chosed == 2:
+                if file_selected == 2:
                     return_code = print_db(file_name)
                 else:
                     print('Файл не выбран или доступен только для записи')
             elif ans == '4':
-                if file_chosed == 1:
-                    return_code = add_to_the_end_of_db(file_name)
-                elif file_chosed == 2:
-                    return_code = add_to_the_end_of_db(file_name,empty_file=0)
+                if file_selected == 1:
+                    return_code = add_to_the_end_of_db(file_name,separator_in_file=SEPARATOR_IN_FILE)
+                elif file_selected == 2:
+                    return_code = add_to_the_end_of_db(file_name,empty_file=0,separator_in_file=SEPARATOR_IN_FILE)
                 else:
                     print('Файл не выбран или доступен только для записи')
             elif ans == '5':
-                if file_chosed == 2:
-                    return_code = search_by_one_field(file_name)
+                if file_selected == 2:
+                    return_code = search_by_one_field(file_name,separator_in_file=SEPARATOR_IN_FILE)
                 else:
                     print('Файл не выбран или доступен только для записи')
             elif ans == '6':
-                if file_chosed == 2:
-                    return_code = search_by_two_fields(file_name)
+                if file_selected == 2:
+                    return_code = search_by_two_fields(file_name,separator_in_file=SEPARATOR_IN_FILE)
                 else:
                     print('Файл не выбран или доступен только для записи')
 
             if return_code:
                 print('\nФайл был открыт некорректно и теперь доступен только для записи.')
-                file_chosed = 1
+                file_selected = 1
                 return_code = 0
         except FileNotFoundError:
             print(f"Произошла непредвиденная ошибка, файл {file_name} не найден")
             print("Проверьте правильность ввода имени файла или введите другой файл")
             file = choosing_file()
             if file:
-                file_chosed = file[1] + 1
+                file_selected = file[1] + 1
                 file_name = file[0]
-        ans = menu(file_is_opened=file_chosed)
+        ans = menu(file_is_opened=file_selected)
     print('Программа завершена')
 
 
