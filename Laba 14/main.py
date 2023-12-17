@@ -3,7 +3,6 @@
 # База данных на бинарном файле
 import os
 import struct
-import sys
 
 def structurize_line(line, bd_struct='6s 30s 30s 30s 5s 5s',
                      encode='Windows-1251'):  # преобразование строки в структуру
