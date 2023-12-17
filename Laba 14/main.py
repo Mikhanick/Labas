@@ -23,11 +23,9 @@ def destructurize_line(line, bd_struct='6s 30s 30s 30s 5s 5s', encode='Windows-1
 
 
 def delete_line(name, bd_struct='6s 30s 30s 30s 5s 5s', encode='Windows-1251'):  # удаление строки
-    index = input('Введите номер строки для удаления: ')
+    index = input('Введите id строки для удаления: ')
     len_line = struct.calcsize(bd_struct)
-    new_text = b''
-    n = 0
-    with open(name, 'rb') as file:  # Построчно ищем и выводим запись, если ее номер совпадает с введенным
+    with open(name, 'r+b') as file:  # Построчно ищем и выводим запись, если ее id совпадает с введенным
         while True:
             text = file.read(len_line)
             if not text:
@@ -42,12 +40,12 @@ def delete_line(name, bd_struct='6s 30s 30s 30s 5s 5s', encode='Windows-1251'): 
             if array[0] == index:
                 print(f'строка {array[0]:^5} | {array[1]:} | {array[2]:} | {array[3]:} | {array[4]:} | {array[5]:}'
                       f' удалена')
-                continue
-            n += 1
-            new_text += structurize_line([str(n)] + array[1:], bd_struct=bd_struct,
-                                         encode=encode)  # записываем все строки, кроме удаляемой
-    with open(name, 'wb') as file:  # перезаписываем файл
-        file.write(new_text)
+                position = file.tell()
+                tail = file.read()
+                file.seek(position-len_line)
+                file.write(tail)
+                file.truncate()
+                break
 
 
 def menu(file_is_opened=1):  # основное меню
@@ -137,10 +135,8 @@ def choosing_file() -> int | tuple[str, int]:  # выбор файла
         return '/'.join(file_name), 0
 
 
-def initialize_db(name, bd_struct='6s 30s 30s 30s 5s 5s', ):
-    # 1 - порядковый номер, 2 - группа, 3 - песня, 4 - альбом, 5 - год создания, 6 - длительность в секундах
-    with open(name, 'wb'):  # создание файла
-        pass
+def initialize_db(name, bd_struct='6s 30s 30s 30s 5s 5s'):
+    # 1 id, 2 - группа, 3 - песня, 4 - альбом, 5 - год создания, 6 - длительность в секундах
     print(f'Ввод данных в файл {name}. Для завершения ввода введите пустую строку')
     n = 0
     names = ['группу', 'песню', 'альбом', 'год создания', 'длительность в секундах']
@@ -148,7 +144,7 @@ def initialize_db(name, bd_struct='6s 30s 30s 30s 5s 5s', ):
     flag_to_write = True
     while flag_to_read:  # ввод данных
         n += 1
-        print(f'Запись песни №{n}')
+        print(f'Запись песни c id = {n}')
         temp_array = [str(n)]
         for field in names:  # ввод данных
             inp = input(f'Введите {field}: ').strip()
@@ -176,55 +172,59 @@ def initialize_db(name, bd_struct='6s 30s 30s 30s 5s 5s', ):
                 break
             temp_array.append(inp)  # добавление введенных данных в массив
         if flag_to_write:  # запись данных в файл поструктурно
-            print(temp_array)
             with open(name, 'ab') as file:
                 file.write(structurize_line(temp_array, bd_struct=bd_struct))  # запись в файл
-    print(f'Запись базы данных в файл {name} завершена')
+    if flag_to_write:
+        print(f'Запись базы данных в файл {name} завершена')
+    else:
+        print(f'Запись базы данных в файл {name} не была произведена')
     return 0
 
 
-def find_last_number(name, bd_struct='6s 30s 30s 30s 5s 5s'):  # поиск последнего номера в файле
+def find_last_number(name, bd_struct='6s 30s 30s 30s 5s 5s'):  # поиск последнего id в файле
     len_line = struct.calcsize(bd_struct)
     with open(name, 'rb') as f:
         f.seek(-len_line, os.SEEK_END)  # Переходим к последней записи
         last_line = destructurize_line(f.read(len_line), bd_struct=bd_struct)[0]
-    return last_line  # возвращаем последний номер
+    return last_line  # возвращаем последний id
 
 
 def print_db(name, bd_struct='6s 30s 30s 30s 5s 5s'):  # вывод базы данных
     len_line = struct.calcsize(bd_struct)
-    array = [0]
+    cnt = 0
     try:
         with open(name, 'rb') as file:
             print('База данных:')
             print(
-                '+-----+---------------------------+-------------------------+--------------------------+'
+                '+------+---------------------------+-------------------------+--------------------------+'
                 '--------------+-------------------------+')
             print(
-                '|  №  |          Группа           |          Песня          |          Альбом          |'
+                '|  id  |          Группа           |          Песня          |          Альбом          |'
                 ' Год создания |'
                 ' Длительность в секундах |')
             print(
-                '+-----+---------------------------+-------------------------+--------------------------+'
+                '+------+---------------------------+-------------------------+--------------------------+'
                 '--------------+'
                 '-------------------------+')
+
             while True:
                 text = file.read(len_line)
                 if not text:
                     break
                 array = destructurize_line(text, bd_struct=bd_struct)
+                cnt+=1
                 if len(array) != 6:
                     text = '" ' + '|'.join(array) + ' "'
                     print(
                         f'Ошибка чтения файла {name} в строке {text} \nИспользуйте другой файл или'
                         f' инициализируйте этот повторно.')
                     return 1
-                print(f'|{array[0]:^5}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5]:^25}|')
+                print(f'|{array[0]:^6}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5]:^25}|')
             print(
-                '+-----+---------------------------+-------------------------+--------------------------+'
+                '+------+---------------------------+-------------------------+--------------------------+'
                 '--------------+--'
                 '-----------------------+')
-        print(f'Всего записей: {array[0]}')
+        print(f'Всего записей: {cnt}')
 
     except ZeroDivisionError:
         print(f'Ошибка чтения файла {name}. Используйте другой файл или инициализируйте этот повторно.')
@@ -239,7 +239,7 @@ def add_to_the_end_of_db(name, empty_file=1, bd_struct='6s 30s 30s 30s 5s 5s'
         n = 0
     else:
         try:
-            n = int(find_last_number(name))  # находим последний номер
+            n = int(find_last_number(name))  # находим последний id
         except UnicodeDecodeError:
             print(f'Ошибка чтения файла {name} из-за неправильной кодировки. '
                   f'Используйте другой файл или инициализируйте этот повторно.')
@@ -252,7 +252,7 @@ def add_to_the_end_of_db(name, empty_file=1, bd_struct='6s 30s 30s 30s 5s 5s'
     flag_to_write = True
     while flag_to_read:  # ввод данных
         n += 1
-        print(f'Запись песни №{n}')
+        print(f'Запись песни id{n}')
         temp_array = [str(n)]
         for field in names:
             inp = input(f'Введите {field}: ').strip()
@@ -280,7 +280,6 @@ def add_to_the_end_of_db(name, empty_file=1, bd_struct='6s 30s 30s 30s 5s 5s'
                 break
             temp_array.append(inp)
         if flag_to_write:  # запись данных в файл поструктурно
-            print(temp_array)
             with open(name, 'ab') as file:
                 file.write(structurize_line(temp_array, bd_struct=bd_struct))
     print(f'Запись базы данных в файл {name} завершена')
@@ -291,7 +290,7 @@ def search_by_one_field(name, bd_struct='6s 30s 30s 30s 5s 5s'
                         ):  # поиск по одному полю
     print('+-------------------------------------+')
     print('|Поиск по одному полю                 |')
-    print('|1. Поиск по номеру                   |')
+    print('|1. Поиск по id                       |')
     print('|2. Поиск по группе                   |')
     print('|3. Поиск по песне                    |')
     print('|4. Поиск по альбому                  |')
@@ -300,7 +299,7 @@ def search_by_one_field(name, bd_struct='6s 30s 30s 30s 5s 5s'
     print('|0. Отмена                            |')
     print('+-------------------------------------+')
 
-    col = input('Введите номер поля для поиска: ')
+    col = input('Введите id поля для поиска: ')
     while not (col == '1' or col == '2' or col == '3' or col == '4' or col == '5' or col == '6' or col == '0'):
         print('Вы ввели некорректный номер поля')
         col = input('Введите номер поля повторно: ')
@@ -310,13 +309,13 @@ def search_by_one_field(name, bd_struct='6s 30s 30s 30s 5s 5s'
     inp = input('Введите значение для поиска: ').strip()
     print('Найденные записи:')
     print(
-        '+-----+---------------------------+-------------------------+--------------------------+--------------+'
+        '+------+---------------------------+-------------------------+--------------------------+--------------+'
         '-------------------------+')
     print(
-        '|  №  |          Группа           |          Песня          |          Альбом          | Год создания |'
+        '|  id  |          Группа           |          Песня          |          Альбом          | Год создания |'
         ' Длительность в секундах |')
     print(
-        '+-----+---------------------------+-------------------------+--------------------------+--------------+'
+        '+------+---------------------------+-------------------------+--------------------------+--------------+'
         '-------------------------+')
     with open(name, 'rb') as file:  # Построчно ищем и выводим записи
         len_line = struct.calcsize(bd_struct)
@@ -332,9 +331,9 @@ def search_by_one_field(name, bd_struct='6s 30s 30s 30s 5s 5s'
                     f' инициализируйте этот повторно.')
                 return 1
             if array[col] == inp:
-                print(f'|{array[0]:^5}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5]:^25}|')
+                print(f'|{array[0]:^6}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5]:^25}|')
     print(
-        '+-----+---------------------------+-------------------------+--------------------------+--------------+-----'
+        '+------+---------------------------+-------------------------+--------------------------+--------------+-----'
         '--------------------+')
     return 0
 
@@ -342,7 +341,7 @@ def search_by_one_field(name, bd_struct='6s 30s 30s 30s 5s 5s'
 def search_by_two_fields(name, bd_struct='6s 30s 30s 30s 5s 5s'):  # поиск по двум полям
     print('+-------------------------------------+')
     print('|Поиск по двум полям                  |')
-    print('|1. Поиск по номеру                   |')
+    print('|1. Поиск по id                       |')
     print('|2. Поиск по группе                   |')
     print('|3. Поиск по песне                    |')
     print('|4. Поиск по альбому                  |')
@@ -368,13 +367,13 @@ def search_by_two_fields(name, bd_struct='6s 30s 30s 30s 5s 5s'):  # поиск 
     inp2 = input('Введите значение второго поля для поиска: ').strip()
     print('Найденные записи:')
     print(
-        '+-----+---------------------------+-------------------------+--------------------------+--------------+----'
+        '+------+---------------------------+-------------------------+--------------------------+--------------+----'
         '---------------------+')
     print(
-        '|  №  |          Группа           |          Песня          |          Альбом          | Год создания | '
+        '|  id  |          Группа           |          Песня          |          Альбом          | Год создания | '
         'Длительность в секундах |')
     print(
-        '+-----+---------------------------+-------------------------+--------------------------+--------------+----'
+        '+------+---------------------------+-------------------------+--------------------------+--------------+----'
         '---------------------+')
     with open(name, 'rb') as file:
         len_line = struct.calcsize(bd_struct)
@@ -390,9 +389,9 @@ def search_by_two_fields(name, bd_struct='6s 30s 30s 30s 5s 5s'):  # поиск 
                     f' инициализируйте этот повторно.')
                 return 1
             if array[col1] == inp1 and array[col2] == inp2:
-                print(f'|{array[0]:^5}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5]:^25}|')
+                print(f'|{array[0]:^6}|{array[1]:^27}|{array[2]:^25}|{array[3]:^26}|{array[4]:^14}|{array[5]:^25}|')
     print(
-        '+-----+---------------------------+-------------------------+--------------------------+--------------+-------'
+        '+------+---------------------------+-------------------------+--------------------------+--------------+-------'
         '------------------+')
     return 0
 
