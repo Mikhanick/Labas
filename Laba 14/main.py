@@ -38,14 +38,18 @@ def delete_line(name, bd_struct='6s 30s 30s 30s 5s 5s', encode='Windows-1251'): 
                     f' инициализируйте этот повторно.')
                 return 1
             if array[0] == index:
-                print(f'строка {array[0]:^5} | {array[1]:} | {array[2]:} | {array[3]:} | {array[4]:} | {array[5]:}'
-                      f' удалена')
-                position = file.tell()
-                tail = file.read()
-                file.seek(position-len_line)
-                file.write(tail)
-                file.truncate()
-                break
+                try:
+                    position = file.tell()
+                    tail = file.read()
+                    file.seek(position-len_line)
+                    file.write(tail)
+                    file.truncate()
+                    print(f'строка {array[0]:^5} | {array[1]:} | {array[2]:} | {array[3]:} | {array[4]:} | {array[5]:}'
+                          f' удалена')
+                    return 0
+                except Exception:
+                    print('Произошла ошибка при удалении записи')
+                    return 1
 
 
 def menu(file_is_opened=1):  # основное меню
@@ -55,9 +59,9 @@ def menu(file_is_opened=1):  # основное меню
         print('|2. Инициализация базы данных (создание или перезапись файла и заполнение его данными) |')
         print('|3. Вывод содержимого базы данных                                                      |')
         print('|4. Добавление записи в конец базы данных                                              |')
-        print('|5. Поиск по одному полю                                                               |')
-        print('|6. Поиск по двум полям                                                                |')
-        print('|7. Удаление строки                                                                    |')
+        print('|5. Удаление строки                                                                    |')
+        print('|6. Поиск по одному полю                                                               |')
+        print('|7. Поиск по двум полям                                                                |')
         print('|0. Выход из программы                                                                 |')
         print('+--------------------------------------------------------------------------------------+')
         inp = input('|Вариант ответа: ').strip()
@@ -428,17 +432,17 @@ def main():
                     return_code = add_to_the_end_of_db(file_name, empty_file=0, bd_struct=BD_STRUCT)
                 else:
                     print('Файл не выбран или доступен только для записи')
-            elif ans == '5':
+            elif ans == '6':
                 if file_selected == 2:
                     return_code = search_by_one_field(file_name, bd_struct=BD_STRUCT)
                 else:
                     print('Файл не выбран или доступен только для записи')
-            elif ans == '6':
+            elif ans == '7':
                 if file_selected == 2:
                     return_code = search_by_two_fields(file_name, bd_struct=BD_STRUCT)
                 else:
                     print('Файл не выбран или доступен только для записи')
-            elif ans == '7':
+            elif ans == '5':
                 if file_selected == 2:
                     return_code = delete_line(file_name, bd_struct=BD_STRUCT)
                 else:
