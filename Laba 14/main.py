@@ -3,7 +3,7 @@
 # База данных на бинарном файле
 import os
 import struct
-
+import sys
 
 def structurize_line(line, bd_struct='6s 30s 30s 30s 5s 5s',
                      encode='Windows-1251'):  # преобразование строки в структуру
@@ -39,18 +39,27 @@ def delete_line(name, bd_struct='6s 30s 30s 30s 5s 5s', encode='Windows-1251'): 
                 return 1
             if array[0] == index:
                 try:
-                    position = file.tell()
-                    tail = file.read()
-                    file.seek(position-len_line)
-                    file.write(tail)
+                    position = file.tell()-len_line
+                    size = file.seek(0,2)
+                    file.seek(size-len_line)
+                    data=file.read(len_line)
+                    file.seek(size-len_line)
                     file.truncate()
+                    file.seek(position)
+                    file.write(data)
+
+                    # position = file.tell()
+                    # tail = file.read()
+                    # file.truncate()
+                    # file.seek(position-len_line)
+                    # file.write(tail)
                     print(f'строка {array[0]:^5} | {array[1]:} | {array[2]:} | {array[3]:} | {array[4]:} | {array[5]:}'
                           f' удалена')
                     return 0
-                except Exception:
+                except ZeroDivisionError:
                     print('Произошла ошибка при удалении записи')
                     return 1
-
+        print('Строки с указанным id не обнаружено.')
 
 def menu(file_is_opened=1):  # основное меню
     if file_is_opened == 2:
