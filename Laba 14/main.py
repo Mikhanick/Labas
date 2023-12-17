@@ -244,10 +244,6 @@ def add_to_the_end_of_db(name, empty_file=1, bd_struct='6s 30s 30s 30s 5s 5s'
     else:
         try:
             n = int(find_last_number(name))  # находим последний id
-        except UnicodeDecodeError:
-            print(f'Ошибка чтения файла {name} из-за неправильной кодировки. '
-                  f'Используйте другой файл или инициализируйте этот повторно.')
-            return 1
         except Exception:
             print('Ошибка чтения базы данных. Используйте другой файл или инициализируйте этот повторно.')
             return 1
